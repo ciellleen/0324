@@ -1,0 +1,141 @@
+# 충전 시 순간 전하량
+
+![image.png](attachment:ce77c5c3-4102-4cae-8193-316468861069:image.png)
+
+```cpp
+#include <iostream>  //cin, cout를 위해
+#include <cmath>  // exp()를 위해
+#include <vector> // malloc 사용 위해
+#include <iomanip> //소수점 자리수 조정 위해
+
+using namespace std;
+
+struct RC_SIM //시간과 커패시터 전류를 저장하는 용도
+{
+    double time;
+    double Ic;
+};
+
+int main(void)
+{
+    double start_time = 0.0;
+    double end_time = 10.0;
+    double time_step = 0.1;
+
+    double R = 1.0; //저항값
+    double C = 1.0; //커패시턴스
+
+    cout << "Input Start Time: ";
+    cin >> start_time; // 시작 시간을 입력
+    cout << endl;
+
+    if (start_time >= end_time) {
+        cout << "Error: Start time must be less than end time." << endl;
+        //시작시간이 종료 시간보다 크거나 같으면 오류 메시지를 출력 후 프로그램 종료
+        return -1;
+    }
+
+    long no_array = (int)((end_time - start_time) / time_step) + 1;
+    // 종료 시간에서 시작 시간을 밴 값을 시간 간격으로 나눈 후 0을 고려해서 1을 더해 계산
+    //인덱스로 사용할 때 정수형이어야 해서
+
+    
+    if (no_array <= 0) {
+        cout << "잘못된 입력입니다." << endl;
+        return -1;
+    }
+    // 배열 크기가 0이하면 잘못된 입력이므로 프로그램 종료
+
+    vector<RC_SIM> rc_data(no_array);
+    // 구조체 배열 정의
+    // 크기가 no_array인 벡터 rc_data를 생성.
+    // RC_SIM 구조체를 원소로 가지는 동적 배열
+
+    double time_constant = R * C;
+    double V = 5.0;
+
+    cout << fixed << setprecision(2);
+    cout << "Time\tCurrent(Ic)" << endl;
+    cout << "--------------------" << endl;
+
+    for (long i = 0; i < no_array; i++)
+    {
+        rc_data[i].time = start_time + i * time_step;
+        //현재 포인트의 시간 계산: 시작 시간에 현재 인덱스와 시간 간격을 곱한 것을 더하기
+        rc_data[i].Ic = (V / R) * (1 - exp(-rc_data[i].time / time_constant));
+        // rc 충전 공식
+        cout << rc_data[i].time << "\t" << rc_data[i].Ic << endl;
+    }
+
+    return 0;
+}
+s
+```
+
+![image.png](attachment:76fefaee-7f1f-4fa9-ad18-c6f8f1ef97ff:image.png)
+
+# 충전 시 순간 전류
+
+![image.png](attachment:7338538c-9a0e-4b82-b13d-7137b0f695ae:image.png)
+
+```cpp
+#include <iostream>  // cin, cout를 위해
+#include <cmath>  // exp()를 위해
+#include <vector> // 동적 배열을 위해
+#include <iomanip> // 소수점 자리수 조정을 위해
+
+using namespace std;
+
+struct RC_SIM // 시간과 커패시터 전류를 저장하는 구조체
+{
+    double time;
+    double Ic;
+};
+
+int main(void)
+{
+    double start_time = 0.0;
+    double end_time = 10.0;
+    double time_step = 0.1;
+
+    double R = 1.0; // 저항값
+    double C = 1.0; // 커패시턴스
+
+    cout << "Input Start Time: ";
+    cin >> start_time; // 시작 시간을 입력
+    cout << endl;
+
+    if (start_time >= end_time) {
+        cout << "Error: Start time must be less than end time." << endl;
+        return -1;
+    }
+
+    long no_array = (int)((end_time - start_time) / time_step) + 1;
+
+    if (no_array <= 0) {
+        cout << "잘못된 입력입니다." << endl;
+        return -1;
+    }
+
+    vector<RC_SIM> rc_data(no_array);
+
+    double time_constant = R * C;
+    double V = 5.0;
+
+    cout << fixed << setprecision(2);
+    cout << "Time\tCurrent(Ic)" << endl;
+    cout << "--------------------" << endl;
+
+    for (long i = 0; i < no_array; i++)
+    {
+        rc_data[i].time = start_time + i * time_step;
+        rc_data[i].Ic = (V / R) * exp(-rc_data[i].time / time_constant); // 방전 시 전류 공식 적용
+        cout << rc_data[i].time << "\t" << rc_data[i].Ic << endl;
+    }
+
+    return 0;
+}
+
+```
+
+![image.png](attachment:f642deb1-8b0b-4f51-be27-322247c72dec:image.png)
